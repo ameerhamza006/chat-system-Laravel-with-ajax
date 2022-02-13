@@ -1,0 +1,200 @@
+
+
+
+<div class="container-fluid">
+<div class="row">
+  
+          <div class="col-md-12">
+            <!-- DIRECT CHAT PRIMARY -->
+            <div class="card card-primary card-outline direct-chat direct-chat-primary">
+              <div class="card-header">
+                <h3 class="card-title">Global chat</h3>
+
+                <div class="card-tools">
+                  <span title="3 New Messages" class="badge bg-primary">3</span>
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                      <i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
+                    <i class="fas fa-comments"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <!-- Conversations are loaded here -->
+                <div class="direct-chat-messages" id="allmessaages" style=" height: auto;" >
+                 
+                </div>
+                <!--/.direct-chat-messages-->
+
+                <!-- Contacts are loaded here -->
+                <div class="direct-chat-contacts">
+                  <ul class="contacts-list">
+                    <li>
+                      <a href="#">
+                        <img class="contacts-list-img" src="{{asset('admin/dist/img/user1-128x128.jpg')}}" alt="User Avatar">
+
+                        <div class="contacts-list-info">
+                          <span class="contacts-list-name">
+                            Count Dracula
+                            <small class="contacts-list-date float-right">2/28/2015</small>
+                          </span>
+                          <span class="contacts-list-msg">How have you been? I was...</span>
+                        </div>
+                        <!-- /.contacts-list-info -->
+                      </a>
+                    </li>
+                    <!-- End Contact Item -->
+                  </ul>
+                  <!-- /.contatcts-list -->
+                </div>
+                <!-- /.direct-chat-pane -->
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+               <!--\\\ <form action="{{route('chat.send')}}" method="post" > -->
+                  <form id="data" method="post" enctype="multipart/form-data">
+						    @csrf
+						     <input type="hidden" name="sender_id" value="{{Auth::user()->id}}" />
+						 
+                  <div class="input-group">
+                    <input type="text" id="sendchat" name="message"  placeholder="Type Message ..." autocomplete="off" class="form-control sendchat">
+                      
+                  <div class="btn btn-default btn-file">
+                    <i class="fas fa-paperclip"></i> Attachment
+                    <input type="file" name="file">
+                 
+                </div>
+                    <span class="input-group-append">
+                      <button type="submit"  class="btn btn-primary">Send</button>
+                    </span>
+                  </div>
+                </form>
+              </div>
+              <!-- /.card-footer-->
+            </div>
+            <!--/.direct-chat -->
+          </div>
+          <!-- /.col -->
+          </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+<script
+    
+ 
+    $(document).ready(function(){
+    fetch();
+    
+    document.getElementById('sendchat').focus();
+    
+    
+   
+    
+    
+    $("form#data").submit(function(e) {
+    e.preventDefault();    
+    var formData = new FormData(this);
+    //console.log(formData)
+    $.ajax({
+        url: "{{route('chat.send')}}",
+        type: 'POST',
+        data: formData,
+        success: function (result) {
+               
+               $("input[type='text']").val("");
+                $("input[type='file']").val("");
+              
+                 $('#allmessaages').html(result);
+        },
+        cache: false,
+        contentType: false,
+        processData: false
+    });
+});
+    
+    
+     setInterval(function(){
+ 
+  fetch();
+ }, 5000);
+    
+   
+    });
+    
+    $.ajaxSetup({
+        header: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    })
+    
+    
+    function fetch(){
+        
+          $.ajax({
+              url:"{{route('chat.all')}}",
+              method:"GET",
+             
+              success:function(result){
+                
+                 $('#allmessaages').html(result);
+                
+                  
+               
+              }
+          })
+        
+    }
+    
+  
+       function sendmessage(id){
+           
+           
+          var message = $("#sendchat").val();
+       //   alert(message)
+          
+          var sendermessages = '';
+          
+          $.ajax({
+              url:"{{route('chat.send')}}",
+              method:"POST",
+              data:{sender_id:id,message:message,_token:"{{csrf_token()}}"},
+              success:function(result){
+                
+                 $("#sendchat").val(" ");
+                 $('#allmessaages').html(result);
+                
+              
+              }
+          })
+          
+           
+       }
+       
+       
+       
+  
+    
+    
+    
+</script>
+
+
+
